@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+// With pool you can have multiple connections, works the same as client
 
 const connectionString = process.env.DATABASE_URL || 'https://localhost:5432/fitness-dev';
 
