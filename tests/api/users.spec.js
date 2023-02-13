@@ -204,7 +204,7 @@ describe("/api/users", () => {
   describe("GET /api/users/me", () => {
     it("sends back users data if valid token is supplied in header", async () => {
       const { fakeUser, token } = await createFakeUserWithToken();
-
+      
       const response = await request(app)
         .get("/api/users/me")
         .set("Authorization", `Bearer ${token}`);

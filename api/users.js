@@ -3,7 +3,9 @@ const express = require("express");
 const router = express.Router();
 
 const jwt = require('jsonwebtoken');
-const { getUserByUsername, createUser } = require("../db");
+
+const { getUserByUsername, createUser, getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db");
+const { unauthorizedUser } = require('./utils')
 
 
 // POST /api/users/register
@@ -90,16 +92,43 @@ router.post('/login', async (req, res, next) => {
 })
 
 // GET /api/users/me
-router.get('/me', async (req, res, next) => {
+router.get('/me', unauthorizedUser, async (req, res, next) => {
   const user = req.user;
 
-  console.log({user});
   try {
-    
+    if (!user) {
+      res.send({
+        error: 'unauthorizedUser',
+        name: 'unauthorizedUser',
+        message: "You must be logged in to perform this action"
+      })
+    } else {
+      res.send(user)
+    }
   } catch ({ name, message }) {
     next({ name, message });
   }
 })
+
 // GET /api/users/:username/routines
+router.get('/:username/routines', async (req, res, next) => {
+  const { username } = req.params;
+  
+  if (req.user.username == username) {
+    try {
+      const yourRoutines = await getAllRoutinesByUser({ username });
+      res.send(yourRoutines);
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  } else {
+    try {
+      const publicRoutines = await getPublicRoutinesByUser({ username });
+      res.send(publicRoutines);
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  }
+})
 
 module.exports = router;
