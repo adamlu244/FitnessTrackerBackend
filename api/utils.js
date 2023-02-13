@@ -12,4 +12,4 @@ function unauthorizedUser (req, res, next) {
   next();
 }
 
-module.exports = { unauthorizedUser }
+module.exports = { unauthorizedUser };
