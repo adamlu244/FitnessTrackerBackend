@@ -57,4 +57,12 @@ router.use('/routines', routinesRouter);
 const routineActivitiesRouter = require('./routineActivities');
 router.use('/routine_activities', routineActivitiesRouter);
 
+router.get('*', (req, res, next) => {
+  res.status(404)
+  res.send({
+    message: "Not Found"
+  })
+
+})
+
 module.exports = router;

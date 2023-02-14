@@ -18,13 +18,13 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 
 async function getRoutineById(id) {
   try {
-    const { rows } = await client.query(
+    const { rows: [ routine ] } = await client.query(
       `SELECT *
       FROM routines
       WHERE id=$1;`
     , [id]);
 
-    return rows;
+    return routine;
   } catch (error) {
     console.error(error);
   }
@@ -122,6 +122,10 @@ async function updateRoutine({ id, ...fields }) {
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
 
+  if (setString.length === 0) {
+    return;
+  }
+
   try {
     const { rows: [ routine ] } = await client.query(
       `UPDATE routines
@@ -144,11 +148,14 @@ async function destroyRoutine(id) {
       WHERE "routineId"=$1;`
     , [id]);
 
-    await client.query(
+    const { rows } = await client.query(
       `DELETE 
       FROM routines
-      WHERE id=$1;`
+      WHERE id=$1
+      RETURNING *;`
     , [id]);
+      
+    return rows;
   } catch (error) {
     console.error(error);
   }

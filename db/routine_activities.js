@@ -37,14 +37,13 @@ async function getRoutineActivityById(id) {
 
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
-    const { rows } = await client.query(
+    const { rows: routine_activities } = await client.query(
       `SELECT *
       FROM routine_activities
-      WHERE routine_activities.id IN
-      (SELECT "routineId" FROM routine_activities WHERE "activityId"=${id});`
+      WHERE "routineId"=${id};`
     );
 
-    return rows;
+    return routine_activities;
   } catch (error) {
     console.error(error);
   }
@@ -87,8 +86,10 @@ async function destroyRoutineActivity(id) {
 async function canEditRoutineActivity(routineActivityId, userId) {
   try {
     const routineActivity = await getRoutineActivityById(routineActivityId);
-    const routine = await getRoutineById(routineActivity.id);
-    if(routine[0].creatorId === userId) {
+    const routineId = routineActivity.routineId;
+    const routine = await getRoutineById(routineId);
+    
+    if(routine.creatorId === userId) {
       return true;
     } else {
       return false;
